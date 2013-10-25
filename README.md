@@ -81,33 +81,29 @@ Drifts:
      overflow would leave you with an actual drift of '1' (not 11).
 
 ###Examples
+The following would block until a minute divisible by 10 was reached.  Minutes divisible by 10 are: 0,10,20,30,40 and 50.
 ```
 $> dateblock -n /10
-```
-    This would block until a minute divisible by 10 was reached.  Minutes
-     divisible by 10 are: 0,10,20,30,40 and 50.
+```bash
 
-```
+The following would block until a second is divisible by 5 was reached and only on hours 3 and 4. This can also be written as such: $> dateblock -s /10 -o 3,4
+```bash
 $> dateblock -c "/5 * 3,4 * * *"
 ```
-    This would block until a second is divisible by 5 was reached and only on
-    hours 3 and 4.
-    This can also be written as such: $> dateblock -s /10 -o 3,4
 
-```
+The following would block until the 5 minute of every hour.
+```bash
 $> dateblock -c "* 5"
-```
-    This would block until the 5 minute of every hour. This can also be written
-    as such:
-          1. $> dateblock -n 5
-          2. $> dateblock -c "* 5 * * * *"
 
+# you can rewrite the above like this too:
+$> dateblock -n 5
+$> dateblock -c "* 5 * * * *"
 ```
+
+The following would block until a hour divisible by 5 was reached on the first half of the month as well as the 20th of the month) Hours divisible by 5 are: 0, 5,10,15 and 20.
+```bash
 $> dateblock -o /5 -d 1-14,20
 ```
-    This would block until a hour divisible by 5 was reached on the first half
-     of the month as well as the 20th of the month) Hours divisible by 5 are: 0,
-     5,10,15 and 20.
 
 ## Datemath
 Datemath allows you to manipulate a date and or time by adding
