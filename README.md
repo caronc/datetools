@@ -82,9 +82,9 @@ Drifts:
 
 ###Examples
 The following would block until a minute divisible by 10 was reached.  Minutes divisible by 10 are: 0,10,20,30,40 and 50.
-```
-$> dateblock -n /10
 ```bash
+$> dateblock -n /10
+```
 
 The following would block until a second is divisible by 5 was reached and only on hours 3 and 4. This can also be written as such: $> dateblock -s /10 -o 3,4
 ```bash
