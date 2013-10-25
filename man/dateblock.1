@@ -25,7 +25,7 @@ dateblock \- delay until a specific time
 .br
 
 .SH DESCRIPTION
-dateblock works similarily to how sleep works except instead for delaying the system for a specific time, we delay the system 'until' a specific time. dateblock could be compared to how cron works with it's crontab definitions.
+dateblock works similar to how sleep works except instead for delaying the system 'for' a specific time, we delay the system 'until' a specific time. Dateblock could be compared to a how cron works with it's crontab definitions.
 .PP
 A variety of syntax is accepted by this tool such as:
 .B
@@ -34,7 +34,7 @@ Value: where 'x' is represented numerically.
 .B
 .IP */x (or /x)
 .B
-Modulous:
+Modulus:
 where 'x' is represented numerically.
 .B
 .IP x-y (or y-x)
@@ -47,11 +47,11 @@ where 'x' and 'y' are are represented numerically.
 Separator:
 where 'x' and 'y' are are represented numerically.
 .PP
-All varations of the syntax mentioned above can be mixed if seperated using
+All variations of the syntax mentioned above can be mixed if separated using
 the 'comma' (Separator) operator.  ie:
 .B
 */a,b,c-d,/e
-is valid. However: x-y-z is not valid, nore is /x/y or /x-y. All values must be within
+is valid. However: x-y-z is not valid, nor is /x/y or /x-y. All values must be within
 the range of it's time type. Thus 400-4000 would never work since no time
 constraint even resides within that range.
 
@@ -72,36 +72,36 @@ do not block for the calculated time; instead print it to the screen and return 
 .IP -s,	--second=SYNTAX
 specify the next second to unblock at with respect to the current time. 
 The syntax can follow any of the identified patterns explained above 
-(Value, Modulous, Range, and Separator). Accepted valu(es): 0 - 59.
+(Value, Modulus, Range, and Separator). Accepted valu(es): 0 - 59.
 .B
 .IP -n,	--minute=SYNTAX
 specify the next minute to unblock at with respect to the
 current time. The syntax can follow any of the identified
-patterns explained above (Value, Modulous, Range, and Separator).
+patterns explained above (Value, Modulus, Range, and Separator).
 Accepted valu(es): 0 - 59.
 .B
 .IP -o,	--hour=SYNTAX
 specify the next hour to unblock at with respect to the
 current time. The syntax can follow any of the identified
-patterns explained above (Value, Modulous, Range, and Separator).
+patterns explained above (Value, Modulus, Range, and Separator).
 Accepted valu(es): 0 - 23.
 .B
 .IP -d,	--dom=SYNTAX
 specify the next day of the month to unblock at with respect to
 the current time. The syntax can follow any of the identified
-patterns explained above (Value, Modulous, Range, and Separator).
+patterns explained above (Value, Modulus, Range, and Separator).
 Accepted valu(es): 1 - 31.
 .B
 .IP -m,	--month=SYNTAX
 specify the next month to unblock at with respect to the
 current time. The syntax can follow any of the identified
-patterns explained above (Value, Modulous, Range, and Separator).
+patterns explained above (Value, Modulus, Range, and Separator).
 Accepted Valu(es): 1 - 12 (Jan=1,...,Dec=12)
 .B
 .IP -w,	--dow=SYNTAX
 specify the next day of the week to unblock at with respect to
 the current time. The syntax can follow any of the identified
-patterns explained above (Value, Modulous, Range, and Separator).
+patterns explained above (Value, Modulus, Range, and Separator).
 Accepted Valu(es): 0 - 6 (Sun=0,...,Sat=6)
 .B
 .IP -c,	--cron=CRON_SYNTAX
@@ -121,15 +121,15 @@ Format explained:
                                            *  *  *  *  *  *
 
 Substitute a asterix (*) as a placeholder for arguments you
-are not interested in. Asterixes are automatically placed in
-strings missing all 6 arguments (separated by whitespace).
+are not interested in. Asterisks are automatically placed in
+strings missing all 6 arguments (separated by white space).
 .B
 .IP -x,	--drift=SEC
 Drifting is an option that allows you to adjust the
 calculated results by some additional time.  Lets say you
 wanted the application to wake up on the 1st minute of each
 10 min interval (1, 11, 21, 31, 41, 51). Specifying the cron
-(minute) '*/1' would not work. Infact the cron of '*/1'
+(minute) '*/1' would not work. In fact the cron of '*/1'
 would unblock at every minute. You could however achieve the
 previous example using a drift value of '60' (seconds) and a
 cron (minute) entry of '*/10'.

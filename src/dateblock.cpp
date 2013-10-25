@@ -114,8 +114,11 @@ void ProgramDetails()
         << "This is free software, and you are welcome to redistribute it" << endl
         << "under certain conditions; see man pages for details." << endl << endl
 
-        << "This tool works similar to how a cron works." << endl
-        << "It will block until the criteria specified has been met." << endl
+        << "This tool works similar to how sleep works except instead." << endl
+        << "of delaying the system 'for' a specific time, it delays the" << endl
+        << "system 'until' a specific time. Dateblock could be compared" << endl
+        << "to how a cron works with its crontab definitions." << endl
+        << "Dateblock will block until a specified criteria is met." << endl
         << "Syntax: " 
         << "dateblock [options]" << endl << endl;
 }
@@ -126,7 +129,7 @@ void ProgramExamples()
 
      << "  x               (Value)     where 'x' is represented"
      << " numerically." << endl
-     << "  */x (or /x)     (Modulous)  where 'x' is represented"
+     << "  */x (or /x)     (Modulus)  where 'x' is represented"
      << " numerically." << endl
 
      << "  x-y (or y-x)    (Range)     where 'x' and 'y' are are"
@@ -134,17 +137,17 @@ void ProgramExamples()
 
      << "  x,y             (Separator) where 'x' and 'y' are are"
      << " represented numerically." << endl << endl;
-   cerr << " Note: All varations of the syntax mentioned above can be mixed"
-     << " if seperated" << endl << "       using the 'comma' (Separator)"
+   cerr << " Note: All variations of the syntax mentioned above can be mixed"
+     << " if separated" << endl << "       using the 'comma' (Separator)"
      << " operator.  ie: */a,b,c-d,/e is valid." << endl
-     << "       However: x-y-z is not valid, nore is /x/y or /x-y. All"
+     << "       However: x-y-z is not valid, nor is /x/y or /x-y. All"
      << " values must be" << endl << "       within the range of it's time type."
      << " Thus 400-4000 would never work since" << endl << "       no time"
      << " constraint even resides within that range."
      << endl << endl;
 
    cerr << " The cron (--cron|-c) switch allows one to specify the standard cron"
-     <<  " formating:" << endl;
+     <<  " formatting:" << endl;
    cerr
      << "     day of week (0 - 6) (Sunday=0) -----------------------+" << endl
      << "     month (1 - 12) ------------------------------------+  |" << endl
@@ -158,12 +161,12 @@ void ProgramExamples()
    cerr << "  Substitute a asterix (*) as a placeholder for arguments"
      << " you are not" << endl
      << "  interested in. Asterixes are automatically placed in strings missing all 6"
-     << endl << "  arguments (separated by whitespace)." << endl << endl;
+     << endl << "  arguments (separated by white space)." << endl << endl;
    cerr << "Drifts: " << endl
         << endl << "  Drifting is an option that allows you to adjust the calculated results by some"
         << endl << "   additional time.  Lets say you wanted the application to wake up on the 1st"
         << endl << "   minute of each 10 min interval (1, 11, 21, 31, 41, 51). Specifying the cron"
-        << endl << "   (minute) '*/1' would not work. Infact the cron of '*/1' would unblock at"
+        << endl << "   (minute) '*/1' would not work. In fact the cron of '*/1' would unblock at"
         << endl << "   every minute. You could however achieve the previous example using a drift"
         << endl << "   value of '60' (seconds) and a cron (minute) entry of '*/10'." << endl << endl;
    cerr << "  Some things to consider about drifting:" << endl
@@ -239,7 +242,7 @@ int main(int argc, char **argv)
        ("dom,d", po::value<string>(), "Day of Month (1-31)")
        ("month,m", po::value<string>(), "Month (1-12) {Jan=1,...,Dec=12}")
        ("dow,w", po::value<string>(), "Day of Week (0-6) {Sun=0,...,Sat=6}")
-       ("cron,c", po::value<string>(), "Cron string formating")
+       ("cron,c", po::value<string>(), "Cron string formatting")
        ("drift,x", po::value<unsigned>(), "Additional drift time (in seconds).")
    ;
 
