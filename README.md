@@ -12,6 +12,7 @@ additionally be installed for this too.
 $> dateblock [options]
 
 ###Allowed options:
+```
   -h [ --help ]         Show this help screen.
   -t [ --test ]         Test (Do not block for the specified period)
   -v [ --verbose ]      Verbose mode
@@ -23,12 +24,15 @@ $> dateblock [options]
   -w [ --dow ] arg      Day of Week (0-6) {Sun=0,...,Sat=6}
   -c [ --cron ] arg     Cron string formatting
   -x [ --drift ] arg    Additional drift time (in seconds).
+```
 
 A variety of syntax is accepted by this tool such as:
+```
   x               (Value)     where 'x' is represented numerically.
   */x (or /x)     (Modulus)  where 'x' is represented numerically.
   x-y (or y-x)    (Range)     where 'x' and 'y' are are represented numerically.
   x,y             (Separator) where 'x' and 'y' are are represented numerically.
+```
 
  Note: All variations of the syntax mentioned above can be mixed if separated
        using the 'comma' (Separator) operator.  ie: */a,b,c-d,/e is valid.
@@ -37,6 +41,7 @@ A variety of syntax is accepted by this tool such as:
        no time constraint even resides within that range.
 
  The cron (--cron|-c) switch allows one to specify the standard cron formatting:
+```
      day of week (0 - 6) (Sunday=0) -----------------------+
      month (1 - 12) ------------------------------------+  |
      day of month (1 - 31) --------------------------+  |  |
@@ -46,6 +51,7 @@ A variety of syntax is accepted by this tool such as:
                                             |  |  |  |  |  |
                                             -  -  -  -  -  -
                                             *  *  *  *  *  *
+```
   Substitute a asterisk (*) as a placeholder for arguments you are not
   interested in. Asterisks are automatically placed in strings missing all 6
   arguments (separated by white space).
@@ -75,22 +81,30 @@ Drifts:
      overflow would leave you with an actual drift of '1' (not 11).
 
 ###Examples
+```
 $> dateblock -n /10
+```
     This would block until a minute divisible by 10 was reached.  Minutes
      divisible by 10 are: 0,10,20,30,40 and 50.
 
+```
 $> dateblock -c "/5 * 3,4 * * *"
+```
     This would block until a second is divisible by 5 was reached and only on
     hours 3 and 4.
     This can also be written as such: $> dateblock -s /10 -o 3,4
 
+```
 $> dateblock -c "* 5"
+```
     This would block until the 5 minute of every hour. This can also be written
     as such:
           1. $> dateblock -n 5
           2. $> dateblock -c "* 5 * * * *"
 
+```
 $> dateblock -o /5 -d 1-14,20
+```
     This would block until a hour divisible by 5 was reached on the first half
      of the month as well as the 20th of the month) Hours divisible by 5 are: 0,
      5,10,15 and 20.
@@ -103,7 +117,8 @@ a specific date.
 ###Syntax:
 datemath [options] [-f DateTimeFormat]
 
-###Options:
+###Options
+```
   -h [ --help ]         Show this help screen.
   -s [ --seconds ] arg  Specify the offset (+/-) in seconds.
   -n [ --minutes ] arg  Specify the offset (+/-) in minutes.
@@ -113,3 +128,4 @@ datemath [options] [-f DateTimeFormat]
   -y [ --years ] arg    Specify the offset (+/-) in years.
   -f [ --format ] arg   Specify the desired output format (see $>man date). The
                         default is: %Y-%m-%d %H:%M:%S
+```
