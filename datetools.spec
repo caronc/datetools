@@ -20,11 +20,11 @@ Summary: A program allowing you to mimic cron based time calculations
 Group: Applications/File
 License: GPLv2+
 Name: datetools
-Release: 1%{?dist}
+Release: 1%{?dist}.nuxref
 Version: 0.8.0
 Source: %{name}-%{version}.tar.gz
 Packager: Chris Caron <lead2gold@gmail.com>
-URL: http://www.lead2gold.org
+URL: http://nuxref.com
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 Requires: boost, libstdc++
 Provides: datetools
