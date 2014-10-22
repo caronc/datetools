@@ -2,7 +2,7 @@
 The following can be used to help install datetools into your environment.
 This tool is not currently compatible with Microsoft Windows.
 
-# Requirements
+## Requirements
 You will require the following in order for this to work correctly:
 * automake
 * autoconf
@@ -12,6 +12,7 @@ You will require the following in order for this to work correctly:
 * boost
 * python v2.4+ (optional)
 
+## Build Procedure
 The following will set a correct build environment
 ```bash
 aclocal
