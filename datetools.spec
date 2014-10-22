@@ -75,7 +75,7 @@ rm -rf $RPM_BUILD_ROOT
 make clean
 
 %files
-%doc README COPYING ChangeLog
+%doc AUTHORS README.md COPYING ChangeLog
 
 %files -n datemath
 %attr(0755,root,root) %{_bindir}/datemath
