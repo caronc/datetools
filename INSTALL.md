@@ -14,7 +14,6 @@ You will require the following in order for this to work correctly:
 
 The following will set a correct build environment
 ```bash
-#aclocal -I m4
 aclocal
 
 ltarg="-i"
@@ -31,9 +30,9 @@ else
 fi
 
 autoheader
-#autoheader constructs config.h.in
 
 automake --add-missing --copy
+
 autoconf
 ```
 
@@ -50,8 +49,8 @@ Otherwise run the following:
 # Compile the code
 make
 
-# Install the content
-# make install
+# Install the package into your system
+make install
 ```
 
 You're done!
