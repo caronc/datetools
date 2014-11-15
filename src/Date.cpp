@@ -665,7 +665,7 @@ const string Date::Str(const string& strFormatIn) const
    // Support %n     a new line
    FindAndReplace(strFormat,"%n","\n");
    // Support %h     a new line
-   FindAndReplace(strFormat,"%b","\n");
+   FindAndReplace(strFormat,"%h","\n");
    // Support %x     locale’s date representation (e.g., 12/31/99)
    FindAndReplace(strFormat,"%x","%M/%d/%y");
    // Support %X     locale’s time representation (e.g., 23:13:48)
