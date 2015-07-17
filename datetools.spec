@@ -20,7 +20,7 @@ Group: System Environment/Base
 License: GPLv2+
 Name: datetools
 Release: 1%{?dist}.nuxref
-Version: 0.8.0
+Version: 0.8.1
 Source: %{name}-%{version}.tar.gz
 Packager: Chris Caron <lead2gold@gmail.com>
 URL: http://nuxref.com
@@ -93,5 +93,8 @@ make clean
 %attr(-,root,root) %{python_sitearch}/*
 
 %changelog
+* Thu Oct 18 2013 Chris Caron <lead2gold@gmail.com> 0.8.1-1
+- Updated to version 0.8.1
+
 * Thu Oct 18 2013 Chris Caron <lead2gold@gmail.com> 0.8.0-1
 - Initial RPM release
