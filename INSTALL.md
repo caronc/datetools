@@ -15,26 +15,7 @@ You will require the following in order for this to work correctly:
 ## Build Procedure
 The following will set a correct build environment
 ```bash
-aclocal
-
-ltarg="-i"
-if test -f "`which glibtoolize`" ; then
-	ltver=`glibtoolize --version | sed -n '1s/.* \([0-9]\).*/\1/p'`
-	if test "${ltver}" = 1 ; then ltarg="" ; fi
-	echo "glibtoolize -c -f $ltarg"
-	glibtoolize -c -f $ltarg
-else
-	ltver=`libtoolize --version | sed -n '1s/.* \([0-9]\).*/\1/p'`
-	if test "${ltver}" = 1 ; then ltarg="" ; fi
-	echo "libtoolize -c -f $ltarg"
-	libtoolize -c -f $ltarg
-fi
-
-autoheader
-
-automake --add-missing --copy
-
-autoconf
+autogen.sh
 ```
 
 If you dont want the python module (optionally over-ride the prefix):
@@ -50,7 +31,9 @@ Otherwise run the following:
 # Compile the code
 make
 
-# Install the package into your system
+# Install the package into your system (as root)
+# some distributions just allow you to prefix
+# the below command with _sudo_
 make install
 ```
 

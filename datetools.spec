@@ -1,5 +1,5 @@
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2014 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -14,10 +14,9 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-AutoReqProv: no
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-Summary: A program allowing you to mimic cron based time calculations
-Group: Applications/File
+Summary: Date Manipulation Tools
+Group: System Environment/Base
 License: GPLv2+
 Name: datetools
 Release: 1%{?dist}.nuxref
@@ -27,25 +26,29 @@ Packager: Chris Caron <lead2gold@gmail.com>
 URL: http://nuxref.com
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 Requires: boost, libstdc++
+Requires: dateblock = %{version}-%{release}
+Requires: datemath = %{version}-%{release}
 Provides: datetools
 BuildRequires: glib-devel
 BuildRequires: boost-devel, libstdc++-devel, python-devel
 # Nice to have available:
 BuildRequires: autoconf, automake, libtool
+
 %description
 Dateblock gives the functionality of a cron job from the command line.
 Simliar to sleep; the tool will block until a specified date/time is
 reached (oppose to sleep which only blocks for a defined number of seconds)
 
-%package -n dateblock-python
-Group: Applications/File
+%package -n python-dateblock
+Group:  Development/Libraries
 Summary: Provides python bindings for dateblock (cron calulations)
 Requires: python, boost
-%description -n dateblock-python
+Obsoletes: dateblock-python
+%description -n python-dateblock
 Provides python bindings for dateblock
 
 %package -n dateblock
-Group: Applications/File
+Group: System Environment/Base
 Summary: command line tool for handling crontab calculations and blocking
 Requires: boost
 %description -n dateblock
@@ -53,7 +56,7 @@ Dateblock allows command line blocking and calculations based on crontab
 input.
 
 %package -n datemath
-Group: Applications/File
+Group: System Environment/Base
 Summary: command line tool for handling date manipulation
 Requires: boost
 %description -n datemath
@@ -63,6 +66,7 @@ Datemath allows you to perform math on the current date
 %setup -q
 
 %build
+./autogen.sh
 %configure
 make %{?_smp_mflags}
 
@@ -85,7 +89,7 @@ make clean
 %attr(0755,root,root) %{_bindir}/dateblock
 %{_mandir}/man1/dateblock.*
 
-%files -n dateblock-python
+%files -n python-dateblock
 %attr(-,root,root) %{python_sitearch}/*
 
 %changelog

@@ -105,6 +105,19 @@ The following would block until a hour divisible by 5 was reached on the first h
 $> dateblock -o /5 -d 1-14,20
 ```
 
+The python bindings are really easy to use too:
+```python
+from dateblock import dateblock
+from datetime import datetime
+
+# Returns the date object it will unblock at
+result = dateblock("* /20", block=False)
+
+print("Blocking until %s" % result.strftime("%Y-%m-%d %H:%M:%S"))
+dateblock("* /20")
+print("Unblocked at %s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+```
+
 ## Datemath
 Datemath allows you to manipulate a date and or time by adding
 and or subtracting to it. It can help with scripting and calculating
@@ -124,4 +137,13 @@ datemath [options] [-f DateTimeFormat]
   -y [ --years ] arg    Specify the offset (+/-) in years.
   -f [ --format ] arg   Specify the desired output format (see $>man date). The
                         default is: %Y-%m-%d %H:%M:%S
+```
+
+## Installation
+Assuming you have GNU C++ compiler and the standard development tools that usually go with it (make, autoconf, automake, etc) then the following will install everything for you.
+```bash
+autogen.sh
+./configure
+make
+sudo make install
 ```
