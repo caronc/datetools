@@ -194,7 +194,7 @@ void ProgramExamples()
      << "    This would block until a second is divisible by 5 was reached and"
      << " only on" << endl
      << "    hours 3 and 4." << endl
-     << "    This can also be written as such: $> dateblock -s /10 -o 3,4"
+     << "    This can also be written as such: $> dateblock -s /5 -o 3,4"
      << endl << endl;
 
       cerr << "$> dateblock -c \"* 5\"" << endl
