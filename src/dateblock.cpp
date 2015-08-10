@@ -129,7 +129,7 @@ void ProgramExamples()
 
      << "  x               (Value)     where 'x' is represented"
      << " numerically." << endl
-     << "  */x (or /x)     (Modulus)  where 'x' is represented"
+     << "  */x (or /x)     (Modulus)   where 'x' is represented"
      << " numerically." << endl
 
      << "  x-y (or y-x)    (Range)     where 'x' and 'y' are are"
