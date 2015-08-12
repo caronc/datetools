@@ -86,12 +86,15 @@ The following would block until a minute divisible by 10 was reached.  Minutes d
 $> dateblock -n /10
 ```
 
-The following would block until a second is divisible by 5 was reached and only on hours 3 and 4. This can also be written as such: $> dateblock -s /10 -o 3,4
+The following would block until a second is divisible by 5 was reached and only on hours 3 and 4. This can also be written as such:
 ```bash
+$> dateblock -s /5 -o 3,4
+
+# you can rewrite the above like this too:
 $> dateblock -c "/5 * 3,4 * * *"
 ```
 
-The following would block until the 5 minute of every hour.
+The following would block until the 5 minute of every hour:
 ```bash
 $> dateblock -c "* 5"
 
