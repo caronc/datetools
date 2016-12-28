@@ -1,17 +1,17 @@
 /*
  Datetools provide a method of manipulating and working dates and times.
  Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
- 
+
  This file is part of Datetools.  Datetools is free software; you can
  redistribute it and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation; either version 2 of
  the License, or (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -44,9 +44,9 @@ namespace {
    const char dayOfWeek[7][10] =
       {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
    const char monAbbrev[12][4] =
-      {"Jan","Feb","Mar","Apr","May","Jun","Aug","Sep","Oct","Nov","Dec"};
+      {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
    const char monOfYear[12][10] =
-      {"January","February","March","April","May","June","August","September","October","November","December"};
+      {"January","February","March","April","May","June","July","August","September","October","November","December"};
 }
 
 // Limits
