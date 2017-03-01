@@ -1,6 +1,6 @@
 /*
  Datetools provide a method of manipulating and working dates and times.
- Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+ Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 
  This file is part of Datetools.  Datetools is free software; you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -246,6 +246,16 @@ void Date::Set(const struct tm &tmObj)
 const bool Date::operator==(const Date& right) const
 {
    return (m_time == right.m_time);
+}
+
+//------------------------------------------------
+//
+//  Function: Operator !=
+//
+//------------------------------------------------
+const bool Date::operator!=(const Date& right) const
+{
+   return (m_time != right.m_time);
 }
 
 //------------------------------------------------
