@@ -1,5 +1,5 @@
 .\Datetools provide a method of manipulating and working dates and times.
-.\Copyright (C) 2013-2015 Chris Caron <lead2gold@gmail.com>
+.\Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 .\
 .\This file is part of Datetools.  Datetools is free software; you can
 .\redistribute it and/or modify it under the terms of the GNU General Public
@@ -110,15 +110,16 @@ addition (the second column)
 
 .B
 Format explained:
-    day of week (0 - 6) (Sunday=0) -----------------------+
-    month (1 - 12) ------------------------------------+  |
-    day of month (1 - 31) --------------------------+  |  |
-    hour (0 - 23) -------------------------------+  |  |  |
-    min (0 - 59) -----------------------------+  |  |  |  |
-    sec (0 - 59) ---------------------------  |  |  |  |  |
-                                           |  |  |  |  |  |
-                                           -  -  -  -  -  -
-                                           *  *  *  *  *  *
+   drift time ----------------------------------------------+
+   day of week (0 - 6) (Sunday=0) -----------------------+  |
+   month (1 - 12) ------------------------------------+  |  |
+   day of month (1 - 31) --------------------------+  |  |  |
+   hour (0 - 23) -------------------------------+  |  |  |  |
+   min (0 - 59) -----------------------------+  |  |  |  |  |
+   sec (0 - 59) ---------------------------  |  |  |  |  |  |
+                                          |  |  |  |  |  |  |
+                                          -  -  -  -  -  -  -
+                                          *  *  *  *  *  *  *
 
 Substitute a asterix (*) as a placeholder for arguments you
 are not interested in. Asterisks are automatically placed in

@@ -26,6 +26,7 @@
 #include <set>
 #include <vector>
 #include <ctype.h>
+#include <sstream>
 #include "Date.h"
 
 #include <boost/tokenizer.hpp>
@@ -65,13 +66,21 @@ const int Date::T_YEAR_MAX=INT_MAX;
 const int Date::T_DOW_MIN=0;
 const int Date::T_DOW_MAX=6;
 
+// Fields
+const int Date::ISC_CRON_FIELD_COUNT = 5;
+const int Date::DBL_CRON_FIELD_COUNT = 7;
+
 // Drift Defaults
-const unsigned long Date::T_NO_DRIFT=0;
+const int Date::T_NO_ENTRY=-1;
+
 // Presently our AddSec() function only handles integers as input and therefore
 // we need to set the max to the maximum values of a 'signed integer' AddSec()
 // will always take a signed value since we allow the decrementing of time by
 // passing in a negative number
-const unsigned long Date::T_DRIFT_MAX=INT_MAX;
+const int Date::T_DRIFT_MAX=INT_MAX;
+
+// Minimum Drift Time
+const int Date::T_DRIFT_MIN=0;
 
 //------------------------------------------------
 //
@@ -363,7 +372,7 @@ const int Date::MaxDOMsPrevMonth() const
    struct tm tmTime;
    time_t tTmp;
    memcpy(&tmTime,&m_tmObj,sizeof(struct tm));
-   if(tmTime.tm_mon ==0)
+   if(tmTime.tm_mon == 0)
    {
       tmTime.tm_mon=11;
       tmTime.tm_year--;
@@ -705,13 +714,15 @@ const string Date::Str(const string& strFormatIn) const
    // Support %H     hour (00..23)
    FindAndReplace(strFormat,"%H",m_tmObj.tm_hour,2);
    // Support %I     hour (01..12)
-   FindAndReplace(strFormat,"%I",(m_tmObj.tm_hour>11)?((m_tmObj.tm_hour+1)/12):(m_tmObj.tm_hour+1),2);
+   FindAndReplace(strFormat,"%I",(m_tmObj.tm_hour>11)?
+         ((m_tmObj.tm_hour+1)/12):(m_tmObj.tm_hour+1),2);
    // Support %j     day of year (001..366)
    FindAndReplace(strFormat,"%j",(m_tmObj.tm_yday)/12,3);
    // Support %k     hour ( 0..23)
    FindAndReplace(strFormat,"%k",m_tmObj.tm_hour,2,' ');
    // Support %l     hour ( 1..12)
-   FindAndReplace(strFormat,"%l",(m_tmObj.tm_hour>11)?((m_tmObj.tm_hour+1)/12):(m_tmObj.tm_hour+1),2,' ');
+   FindAndReplace(strFormat,"%l",(m_tmObj.tm_hour>11)?
+         ((m_tmObj.tm_hour+1)/12):(m_tmObj.tm_hour+1),2,' ');
    // Support %m     month (00..59)
    FindAndReplace(strFormat,"%m",(m_tmObj.tm_mon+1),2);
    // Support %M     minute (00..59)
@@ -743,13 +754,13 @@ const string Date::Str(const string& strFormatIn) const
 //  Function: Cron (Basic)
 //
 //------------------------------------------------
-const Date Date::Cron( int lSecOffset,
-                       int lMinOffset,
-                       int lHourOffset,
-                       int lDomOffset,
-                       int lMonthOffset,
-                       int lDowOffset,
-                       unsigned long lDriftOffset) const
+const Date Date::Cron(int lSecOffset,
+                      int lMinOffset,
+                      int lHourOffset,
+                      int lDomOffset,
+                      int lMonthOffset,
+                      int lDowOffset,
+                      int lDriftOffset) const
 {
    Date dObjFinish(*this);
    Date dObjRef(*this);
@@ -782,6 +793,8 @@ const Date Date::Cron( int lSecOffset,
                    lMonthOffset <= Date::T_MONTH_MAX);
    bool bSetDow=(lDowOffset >= Date::T_DOW_MIN &&
                  lDowOffset <= Date::T_DOW_MAX);
+   bool bSetDrift=(lDriftOffset >= Date::T_DRIFT_MIN &&
+                 lDriftOffset <= Date::T_DRIFT_MAX);
 
    if (!bSetSec)
         lSecOffset=Date::T_SEC_MIN;     // Force Default
@@ -795,6 +808,11 @@ const Date Date::Cron( int lSecOffset,
         lMonthOffset=Date::T_MONTH_MIN; // Force Default
    if (!bSetDow)
         lDowOffset=Date::T_DOW_MIN;     // Force Default
+   if (!bSetDrift)
+        lDriftOffset=0;                 // Force Default
+
+   // No need to set drift default because if one wasn't detected then
+   // we use whatever was passed in as an option instead
 
    if (!( bSetMin || bSetHour || bSetDom || bSetMonth || bSetDow ))
    {
@@ -808,7 +826,7 @@ const Date Date::Cron( int lSecOffset,
    // result. We need to factor this into our calculation a head of time.
    // If a drift has been specified, we have to assume the current time
    // is actually in the past by the same amount.
-   if (lDriftOffset != T_NO_DRIFT)
+   if (lDriftOffset > 0)
    {
       dObjRef.AddSec(-lDriftOffset);
       dObjFinish.AddSec(-lDriftOffset);
@@ -840,8 +858,8 @@ const Date Date::Cron( int lSecOffset,
               << " " << lDomOffset
               << " " << lMonthOffset
               << " " << lDowOffset
+              << " " << lDriftOffset
               << "'"
-              << ", DRIFT=" << lDriftOffset
               << ", REF=" << dObjRef.Str()
               << endl;
          // Fail; there is a system problem!
@@ -1078,7 +1096,7 @@ const Date Date::Cron( int lSecOffset,
       }
 
       // Accomodate Drift time if nessisary
-      if (lDriftOffset != T_NO_DRIFT)
+      if (lDriftOffset > 0)
          dObjFinish.AddSec(lDriftOffset);
 
       // We don't use our reference object for the final check; instead we use
@@ -1120,7 +1138,7 @@ const Date Date::Cron( int lSecOffset,
          else if(bSetDow)dObjFinish.AddDOM(1);
 
          // Remove Drift Accomodation (if set)
-         if (lDriftOffset != T_NO_DRIFT)
+         if (lDriftOffset > 0)
             dObjFinish.AddSec(-lDriftOffset);
 
          #ifdef DEBUG
@@ -1148,16 +1166,16 @@ const Date Date::Cron( int lSecOffset,
 //  Function: CronValid (Advanced)
 //
 //------------------------------------------------
-bool Date::CronValid( const string& sSecOffset,
-                            const string& sMinOffset,
-                            const string& sHourOffset,
-                            const string& sDomOffset,
-                            const string& sMonthOffset,
-                            const string& sDowOffset,
-                            unsigned long lDriftOffset)
+bool Date::CronValid(const string& sSecOffset,
+                     const string& sMinOffset,
+                     const string& sHourOffset,
+                     const string& sDomOffset,
+                     const string& sMonthOffset,
+                     const string& sDowOffset,
+                     const string& sDriftOffset)
 {
    static Date tmpDate;
-   // Calculate Possible Seconds Combiniation
+   // Calculate Possible Combinations
    set<int> comboList[COMBO_COUNT]; // Build Combination List
    return(
          tmpDate.ParseCronString(
@@ -1178,21 +1196,20 @@ bool Date::CronValid( const string& sSecOffset,
          tmpDate.ParseCronString(
             sDowOffset,
             comboList[COMBO_DOW],T_DOW_MIN,T_DOW_MAX) &&
-         lDriftOffset <= T_DRIFT_MAX
-    );
+         tmpDate.ParseCronString(
+            sDriftOffset,
+            comboList[COMBO_DRIFT],T_DRIFT_MIN,T_DRIFT_MAX));
 }
 
 //------------------------------------------------
 //
 //  Function: CronValid
 //            (using whitespace as a delimiter)
+//
 //------------------------------------------------
-bool Date::CronValid( const string& strIn,
-                      unsigned long lDriftOffset,
-                      bool isISC )
+bool Date::CronValid(const string& strIn, bool isISC)
 {
-
-   //         Normal Format
+   //         Dateblock Format
    //
    //     +------------------------------ second (0 - 59)
    //     |  +--------------------------- min (0 - 59)
@@ -1200,10 +1217,10 @@ bool Date::CronValid( const string& strIn,
    //     |  |  |  +----------------- day of month (1 - 31)
    //     |  |  |  |  +----------- month (1 - 12)
    //     |  |  |  |  |  +----- day of week (0 - 6) (Sunday=0)
-   //     |  |  |  |  |  |
-   //     |  |  |  |  |  |
-   //     -  -  -  -  -  -
-   //     *  *  *  *  *  *
+   //     |  |  |  |  |  |  +- drift time (defaults to zero)
+   //     |  |  |  |  |  |  |
+   //     -  -  -  -  -  -  -
+   //     *  *  *  *  *  *  *
    //
    //         ISC Format (no second)
    //
@@ -1220,8 +1237,8 @@ bool Date::CronValid( const string& strIn,
    boost::char_separator<char> sep(" \t\n\r\v\f");
    tokenizer tokens(strIn, sep);
    // ISC only processes the first 5 fields, where as
-   // otherwise we process the first 6
-   size_t token_max = isISC?5:6;
+   // otherwise we process the first 7
+   size_t token_max = isISC?ISC_CRON_FIELD_COUNT:DBL_CRON_FIELD_COUNT;
 
    vector<string> v_tokens;
    for (tokenizer::iterator tok_iter = tokens.begin();
@@ -1231,6 +1248,21 @@ bool Date::CronValid( const string& strIn,
       {
          // no more entries
          break;
+      }
+
+      // Look for a + as that signifies the drift entry
+      // The idea here is we want to be able to put +digit
+      // anywhere in our cron to just imediately interpret
+      // that value as a drift.
+      if (isISC == false && (*tok_iter)[0] == '+')
+      {
+         // drift entry
+         //
+         // first fill in our blanks
+         while ( v_tokens.size() < (token_max-1) )
+            v_tokens.insert(v_tokens.end(), "*");
+         // lastly insert our drift entry which is the last entry
+         v_tokens.insert(v_tokens.end(), &(*tok_iter)[1]);
       }
       v_tokens.insert(v_tokens.end(), *tok_iter);
    }
@@ -1243,10 +1275,11 @@ bool Date::CronValid( const string& strIn,
    return isISC?
          // Yes? Ok then skip the 'seconds' field (defaults to '*')
          CronValid("*", v_tokens[0], v_tokens[1], v_tokens[2],
-                        v_tokens[3], v_tokens[4], lDriftOffset):
+                        v_tokens[3], v_tokens[4], "*"):
          // No? Then handle all of the arguments
          CronValid(v_tokens[0], v_tokens[1], v_tokens[2],
-                   v_tokens[3], v_tokens[4], v_tokens[5], lDriftOffset);
+                   v_tokens[3], v_tokens[4], v_tokens[5],
+                   v_tokens[6]);
 }
 
 //------------------------------------------------
@@ -1254,13 +1287,13 @@ bool Date::CronValid( const string& strIn,
 //  Function: Cron (Advanced)
 //
 //------------------------------------------------
-const Date Date::Cron( const string& sSecOffset,
-                       const string& sMinOffset,
-                       const string& sHourOffset,
-                       const string& sDomOffset,
-                       const string& sMonthOffset,
-                       const string& sDowOffset,
-                       unsigned long lDriftOffset ) const
+const Date Date::Cron(const string& sSecOffset,
+                      const string& sMinOffset,
+                      const string& sHourOffset,
+                      const string& sDomOffset,
+                      const string& sMonthOffset,
+                      const string& sDowOffset,
+                      const string& sDriftOffset) const
 {
 
    set<int> comboList[COMBO_COUNT]; // Build Combination List
@@ -1271,8 +1304,9 @@ const Date Date::Cron( const string& sSecOffset,
     ParseCronString(sMinOffset,comboList[COMBO_MIN],T_MIN_MIN,T_MIN_MAX) &&
     ParseCronString(sHourOffset,comboList[COMBO_HOUR],T_HOUR_MIN,T_HOUR_MAX) &&
     ParseCronString(sDomOffset,comboList[COMBO_DOM],T_DOM_MIN,T_DOM_MAX) &&
-    ParseCronString(sMonthOffset,comboList[COMBO_MONTH],T_MONTH_MIN,T_MONTH_MAX)
-    && ParseCronString(sDowOffset,comboList[COMBO_DOW],T_DOW_MIN,T_DOW_MAX))
+    ParseCronString(sMonthOffset,comboList[COMBO_MONTH],T_MONTH_MIN,T_MONTH_MAX) &&
+    ParseCronString(sDowOffset,comboList[COMBO_DOW],T_DOW_MIN,T_DOW_MAX) &&
+    ParseCronString(sDriftOffset,comboList[COMBO_DRIFT],T_DRIFT_MIN,T_DRIFT_MAX))
    {
       // Prepare Iterators
       set<int>::const_iterator itrSec,
@@ -1280,11 +1314,13 @@ const Date Date::Cron( const string& sSecOffset,
                                itrHour,
                                itrDom,
                                itrMonth,
-                               itrDow;
+                               itrDow,
+                               itrDrift;
 
       // Date Object to Hold on to the lowest reference point
       Date dObjRef(dObjFinish);
-      // Big On6 unfortunately.  Perhaps this section could be
+
+      // Big On7 unfortunately.  Perhaps this section could be
       // more smarter and only handle obviously newer times and skip
       // the obvious short ones.
       itrSec  = comboList[COMBO_SEC].begin();
@@ -1305,25 +1341,29 @@ const Date Date::Cron( const string& sSecOffset,
                      itrDow  = comboList[COMBO_DOW].begin();
                      for(;itrDow != comboList[COMBO_DOW].end();itrDow++)
                      {
-                        // Build Reference Point
-                        dObjRef=Cron(*itrSec,
-                                     *itrMin,
-                                     *itrHour,
-                                     *itrDom,
-                                     *itrMonth,
-                                     *itrDow,
-                                     lDriftOffset);
+                        itrDrift  = comboList[COMBO_DRIFT].begin();
+                        for(;itrDrift != comboList[COMBO_DRIFT].end();itrDrift++)
+                        {
+                           // Build Reference Point
+                           dObjRef=Cron(*itrSec,
+                                        *itrMin,
+                                        *itrHour,
+                                        *itrDom,
+                                        *itrMonth,
+                                        *itrDow,
+                                        *itrDrift);
 
-                        // Store Value if nessisary
-                        if(dObjRef < dObjFinish)
-                           dObjFinish = dObjRef;
+                           // Store Value if nessisary
+                           if(dObjRef < dObjFinish)
+                              dObjFinish = dObjRef;
 
-                        // First time Entry; Store reference
-                        // reguardless
-                        else if(dObjFinish == *this)
-                           dObjFinish = dObjRef;
+                           // First time Entry; Store reference
+                           // reguardless
+                           else if(dObjFinish == *this)
+                              dObjFinish = dObjRef;
 
-                     }
+                        } // Drift
+                     } // Day of Week
                   } // Month
                } // Day of Month
             } // Hours
@@ -1339,10 +1379,8 @@ const Date Date::Cron( const string& sSecOffset,
 //  Function: Cron
 //            (using whitespace as a delimiter)
 //------------------------------------------------
-const Date Date::Cron( const string& strIn,
-                       unsigned long nDrift, bool isISC ) const
+const Date Date::Cron(const string& strIn, bool isISC) const
 {
-
    //         Normal Format
    //
    //     +------------------------------ second (0 - 59)
@@ -1351,10 +1389,10 @@ const Date Date::Cron( const string& strIn,
    //     |  |  |  +----------------- day of month (1 - 31)
    //     |  |  |  |  +----------- month (1 - 12)
    //     |  |  |  |  |  +----- day of week (0 - 6) (Sunday=0)
-   //     |  |  |  |  |  |
-   //     |  |  |  |  |  |
-   //     -  -  -  -  -  -
-   //     *  *  *  *  *  *
+   //     |  |  |  |  |  |  +- drift time (defaults to zero)
+   //     |  |  |  |  |  |  |
+   //     -  -  -  -  -  -  -
+   //     *  *  *  *  *  *  *
    //
    //         ISC Format (no second)
    //
@@ -1372,7 +1410,7 @@ const Date Date::Cron( const string& strIn,
    tokenizer tokens(strIn, sep);
    // ISC only processes the first 5 fields, where as
    // otherwise we process the first 6
-   size_t token_max = isISC?5:6;
+   size_t token_max = isISC?ISC_CRON_FIELD_COUNT:DBL_CRON_FIELD_COUNT;
 
    vector<string> v_tokens;
    for (tokenizer::iterator tok_iter = tokens.begin();
@@ -1383,6 +1421,21 @@ const Date Date::Cron( const string& strIn,
          // no more entries
          break;
       }
+
+      // Look for a + as that signifies the drift entry
+      // The idea here is we want to be able to put +digit
+      // anywhere in our cron to just imediately interpret
+      // that value as a drift.
+      if (isISC == false && (*tok_iter)[0] == '+')
+      {
+         // drift entry
+         //
+         // first fill in our blanks
+         while ( v_tokens.size() < (token_max-1) )
+            v_tokens.insert(v_tokens.end(), "*");
+         // lastly insert our drift entry which is the last entry
+         v_tokens.insert(v_tokens.end(), &(*tok_iter)[1]);
+      }
       v_tokens.insert(v_tokens.end(), *tok_iter);
    }
 
@@ -1391,25 +1444,30 @@ const Date Date::Cron( const string& strIn,
       v_tokens.insert(v_tokens.end(), "*");
 
    // Convert to cron
-   //cout << "Cron(*" << ',' << v_tokens[0] << ','
-   //                 << v_tokens[1] << ','
-   //                 << v_tokens[2] << ','
-   //                 << v_tokens[3] << ','
-   //                 << v_tokens[4] << ','
-   //                 << v_tokens[5] << ')' << endl;
+   #ifdef DEBUG
+   cerr << "DEBUG Date::Cron("
+      << v_tokens[0] << ","
+      << v_tokens[1] << ","
+      << v_tokens[2] << ","
+      << v_tokens[3] << ","
+      << v_tokens[4] << ","
+      << v_tokens[5] << ","
+      << v_tokens[6] << "),"
+      << " ISC=" << ((string) (isISC?"y":"n"))
+      << endl;
+   #endif
+
    return isISC?
          // Yes? Ok then skip the 'seconds' field (defaults to '*')
-         Cron("*", v_tokens[0], v_tokens[1], v_tokens[2],
-                   v_tokens[3], v_tokens[4], nDrift):
+         Cron("*", v_tokens[0], v_tokens[1], v_tokens[2], v_tokens[3],
+               v_tokens[4], "*"):
          // No? Then handle all of the arguments
-         Cron(v_tokens[0], v_tokens[1], v_tokens[2],
-              v_tokens[3], v_tokens[4], v_tokens[5], nDrift);
+         Cron(v_tokens[0], v_tokens[1], v_tokens[2], v_tokens[3], v_tokens[4],
+              v_tokens[5], v_tokens[6]);
 }
 
-bool Date::ParseCronString(const string& strIn,
-                             set<int> &comboListOut,
-                             int minVal,
-                             int maxVal) const
+bool Date::ParseCronString(const string& strIn, set<int> &comboListOut,
+                             int minVal, int maxVal) const
 {
    // Valid characters for strIn are:
    //   0-9,/*
@@ -1429,7 +1487,8 @@ bool Date::ParseCronString(const string& strIn,
 
       for(itr=tokens.begin(); itr!=tokens.end(); itr++)
       {
-         // cout << "DEBUG: Parsing '" << *itr <<  "' Size: " << itr->size() << endl;
+         // cout << "DEBUG: Parsing '" << *itr <<  "' Size: "
+         //    << itr->size() << endl;
          startPos=0; // Reset Pointer
          nextPos=0; // Reset Pointer
          while(startPos < itr->size())
@@ -1450,7 +1509,7 @@ bool Date::ParseCronString(const string& strIn,
                   startPos = ++nextPos;
                   continue;
                }
-               else if((*itr)[nextPos] == '-' && rangeStart < 0 )
+               else if((*itr)[nextPos] == '-' && rangeStart < 0)
                {
                   if(modFlag == true)
                   {
@@ -1479,10 +1538,11 @@ bool Date::ParseCronString(const string& strIn,
                   continue;
 
                }
-               else if((*itr)[nextPos] == '/' && modFlag == false )
+               else if((*itr)[nextPos] == '/' && modFlag == false)
                {
                   // Mod Val
                   modFlag=true;
+
                   // Update positions to look past dash
                   startPos = ++nextPos;
                   continue;

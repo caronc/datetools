@@ -35,6 +35,32 @@ using namespace std;
 class Date
 {
    public:
+     // Some Min/Max Restrictions
+     static const int T_SEC_MIN;
+     static const int T_SEC_MAX;
+     static const int T_MIN_MIN;
+     static const int T_MIN_MAX;
+     static const int T_HOUR_MIN;
+     static const int T_HOUR_MAX;
+     static const int T_MONTH_MIN;
+     static const int T_MONTH_MAX;
+     static const int T_YEAR_MIN;
+     static const int T_YEAR_MAX;
+     static const int T_DOM_MIN;
+     static const int T_DOM_MAX;
+     static const int T_DOW_MIN;
+     static const int T_DOW_MAX;
+     static const int T_DRIFT_MIN;
+     static const int T_DRIFT_MAX;
+     static const int T_NO_ENTRY;
+
+     // ISC Cron Fields (5 of them)
+     static const int ISC_CRON_FIELD_COUNT;
+
+     // Dateblock Cron Fields (7 of them at this time) with the extension of
+     // both seconds and drift)
+     static const int DBL_CRON_FIELD_COUNT;
+
      Date();
      Date(int year,
           int month = 1,
@@ -86,8 +112,8 @@ class Date
      const time_t Time()const;
      const struct tm& Tm()const;
 
-     const string Str(const string& format = "%Y-%m-%d %H:%M:%S") const; // returns a string based on
-                                                   // passed in format
+     // returns a string based on passed in format
+     const string Str(const string& format="%Y-%m-%d %H:%M:%S") const;
 
      const int Sec() const; // returns 0-59
      const int Min() const; // returns 0-59
@@ -100,29 +126,6 @@ class Date
      const int MaxDOMsThisMonth() const; // returns 1-31
      const int MaxDOMsNextMonth() const; // returns 1-31
      const int MaxDOMsPrevMonth() const; // returns 1-31
-
-     // Cron
-     //  -1 means not set.
-     //  Valid Ranges are as follows:
-     //     Second (0-59) Default=0
-     //     Minute (0-59)
-     //     Hour (0-23)
-     //     DOM of Month (1-31)
-     //     Month (1-11) {Jan=1,...,Dec=12}
-     //     DOM of Week (0-6) {Sun=0,...,Sat=6}
-     //     Drift Offset identifies how many seconds to adjust
-     //     the final results by.
-     //  Returns a Date Object of the next moment in time
-     //  that matches specified cron entry
-     //  By default lSecoffset is always set to 0 if 'nothing'
-     //    else was specified.
-     const Date Cron( int lSecOffset      = -1,
-                      int lMinOffset      = -1,
-                      int lHourOffset     = -1,
-                      int lDomOffset      = -1,
-                      int lMonthOffset    = -1,
-                      int lDowOffset      = -1,
-                      unsigned long lDriftOffset = 0) const;
 
      // A more advanced cron that calculates cron syntax such as:
      // 0-4,6      (which would handle 0,1,2,3,4,6)
@@ -141,25 +144,51 @@ class Date
      // to '*' as their default value;  They are not defined
      // as defaults below to remove any ambiguity with the other
      // CronValid() function
-     static bool CronValid( const string& sSecOffset,
-                            const string& sMinOffset,
-                            const string& sHourOffset,
-                            const string& sDomOffset   = "*",
-                            const string& sMonthOffset = "*",
-                            const string& sDowOffset   = "*",
-                            unsigned long lDriftOffset = 0);
+     static bool CronValid(const string& sSecOffset,
+                           const string& sMinOffset,
+                           const string& sHourOffset,
+                           const string& sDomOffset   = "*",
+                           const string& sMonthOffset = "*",
+                           const string& sDowOffset   = "*",
+                           const string& sDriftOffset = "*");
+
+     static bool CronValid(const string& sCronStr="*  *  *  *  *  *  *",
+                            bool isISC=false);
+
+     // Cron
+     //  -1 means not set.
+     //  Valid Ranges are as follows:
+     //     Second (0-59) Default=0
+     //     Minute (0-59)
+     //     Hour (0-23)
+     //     DOM of Month (1-31)
+     //     Month (1-11) {Jan=1,...,Dec=12}
+     //     DOM of Week (0-6) {Sun=0,...,Sat=6}
+     //     Drift Offset identifies how many seconds to adjust
+     //     the final results by.
+     //  Returns a Date Object of the next moment in time
+     //  that matches specified cron entry
+     //  By default lSecoffset is always set to 0 if 'nothing'
+     //    else was specified.
+     const Date Cron(int lSecOffset   = T_NO_ENTRY,
+                     int lMinOffset   = T_NO_ENTRY,
+                     int lHourOffset  = T_NO_ENTRY,
+                     int lDomOffset   = T_NO_ENTRY,
+                     int lMonthOffset = T_NO_ENTRY,
+                     int lDowOffset   = T_NO_ENTRY,
+                     int lDriftOffset = T_NO_ENTRY) const;
 
      // sSecOffset, sMinOffset, and sHourOffset can all be set
      // to '*' as their default value;  They are not defined
      // as defaults below to remove any ambiguity with the other
      // Cron() function
-     const Date Cron( const string& sSecOffset,
-                      const string& sMinOffset,
-                      const string& sHourOffset,
-                      const string& sDomOffset   = "*",
-                      const string& sMonthOffset = "*",
-                      const string& sDowOffset   = "*",
-                      unsigned long nDriftOffset=T_NO_DRIFT) const;
+     const Date Cron(const string& sSecOffset,
+                     const string& sMinOffset,
+                     const string& sHourOffset,
+                     const string& sDomOffset   = "*",
+                     const string& sMonthOffset = "*",
+                     const string& sDowOffset   = "*",
+                     const string& sDriftOffset = "*") const;
 
      // Support the ISC Cron Formatting (same as above, but without
      // the seconds) (UNIX/Linux Crontab equivalent)
@@ -174,44 +203,18 @@ class Date
      //                                   String: *  *  *  *  *
      //
      // Standard Formatting
-     //
-     // day of week (0 - 6) (Sunday=0) -----------------------+
-     // month (1 - 12) ------------------------------------+  |
-     // day of month (1 - 31) --------------------------+  |  |
-     // hour (0 - 23) -------------------------------+  |  |  |
-     // min (0 - 59) -----------------------------+  |  |  |  |
-     // seconds(0 - 59) -----------------------+  |  |  |  |  |
-     //                                        |  |  |  |  |  |
-     //                                        -  -  -  -  -  -
-     //                                String: *  *  *  *  *  *
-     const Date Cron( const string& sCronStr="*  *  *  *  *  *",
-                      unsigned long nDrift=T_NO_DRIFT,
-                      bool isISC = false) const;
-
-
-     static bool CronValid( const string& sCronStr="*  *  *  *  *  *",
-                            unsigned long nDriftOffset=T_NO_DRIFT,
-                            bool isISC=false );
-
-     static const int T_SEC_MIN;
-     static const int T_SEC_MAX;
-     static const int T_MIN_MIN;
-     static const int T_MIN_MAX;
-     static const int T_HOUR_MIN;
-     static const int T_HOUR_MAX;
-     static const int T_MONTH_MIN;
-     static const int T_MONTH_MAX;
-     static const int T_CRON_MONTH_MIN;
-     static const int T_CRON_MONTH_MAX;
-     static const int T_YEAR_MIN;
-     static const int T_YEAR_MAX;
-     static const int T_DOM_MIN;
-     static const int T_DOM_MAX;
-     static const int T_DOW_MIN;
-     static const int T_DOW_MAX;
-
-     static const unsigned long T_NO_DRIFT;
-     static const unsigned long T_DRIFT_MAX;
+     // drift time --------------------------------------------+
+     // day of week (0 - 6) (Sunday=0) ---------------------+  |
+     // month (1 - 12) ----------------------------------+  |  |
+     // day of month (1 - 31) ------------------------+  |  |  |
+     // hour (0 - 23) -----------------------------+  |  |  |  |
+     // min (0 - 59) ---------------------------+  |  |  |  |  |
+     // seconds(0 - 59) ---------------------+  |  |  |  |  |  |
+     //                                      |  |  |  |  |  |  |
+     //                                      -  -  -  -  -  -  -
+     //                              String: *  *  *  *  *  *  *
+     const Date Cron(const string& sCronStr="*  *  *  *  *  *  *",
+                     bool isISC = false) const;
 
    private:
      struct tm m_tmObj;
@@ -226,6 +229,7 @@ class Date
          COMBO_DOM,
          COMBO_MONTH,
          COMBO_DOW,
+         COMBO_DRIFT,
          COMBO_COUNT
       };
 
@@ -235,16 +239,13 @@ class Date
      bool FindAndReplace(string &sourceString, const string &findString,
                 const int &replaceNum,
                 int width = 1 ,
-                char fill = '0' ) const;
+                char fill = '0') const;
 
-     size_t Tokenize(const string& strIn,
-                     char delimiter,
+     size_t Tokenize(const string& strIn, char delimiter,
                      vector<string> &tokensOut) const;
 
-     bool ParseCronString(const string& strIn,
-                            set<int> &comboListOut,
-                            int minVal,
-                            int maxVal) const;
+     bool ParseCronString(const string& strIn, set<int> &comboListOut,
+                            int minVal, int maxVal) const;
 };
 
 inline const time_t Date::Time() const

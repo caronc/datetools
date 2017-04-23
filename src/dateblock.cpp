@@ -1,17 +1,17 @@
 /*
  Datetools provide a method of manipulating and working dates and times.
  Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
- 
+
  This file is part of Datetools.  Datetools is free software; you can
  redistribute it and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation; either version 2 of
  the License, or (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License along with
  this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -109,7 +109,7 @@ unsigned long Block(unsigned long nsecs)
 void ProgramDetails()
 {
    cerr << "Dateblock v" << PACKAGE_VERSION  << " "
-        << "Copyright (C) 2013 " << AUTHOR << endl << endl
+        << "Copyright (C) 2013-2017 " << AUTHOR << endl << endl
         << "Dateblock comes with ABSOLUTELY NO WARRANTY" << endl
         << "This is free software, and you are welcome to redistribute it" << endl
         << "under certain conditions; see man pages for details." << endl << endl
@@ -119,7 +119,7 @@ void ProgramDetails()
         << "system 'until' a specific time. Dateblock could be compared" << endl
         << "to how a cron works with its crontab definitions." << endl
         << "Dateblock will block until a specified criteria is met." << endl
-        << "Syntax: " 
+        << "Syntax: "
         << "dateblock [options]" << endl << endl;
 }
 
@@ -149,15 +149,16 @@ void ProgramExamples()
    cerr << " The cron (--cron|-c) switch allows one to specify the standard cron"
      <<  " formatting:" << endl;
    cerr
-     << "     day of week (0 - 6) (Sunday=0) -----------------------+" << endl
-     << "     month (1 - 12) ------------------------------------+  |" << endl
-     << "     day of month (1 - 31) --------------------------+  |  |" << endl
-     << "     hour (0 - 23) -------------------------------+  |  |  |" << endl
-     << "     min (0 - 59) -----------------------------+  |  |  |  |" << endl
-     << "     sec (0 - 59) ---------------------------  |  |  |  |  |" << endl
-     << "                                            |  |  |  |  |  |" << endl
-     << "                                            -  -  -  -  -  -" << endl
-     << "                                            *  *  *  *  *  *" << endl;
+     << "     drift time ------------------------------------------+" << endl
+     << "     day of week (0 - 6) (Sunday=0) -------------------+  |" << endl
+     << "     month (1 - 12) --------------------------------+  |  |" << endl
+     << "     day of month (1 - 31) ----------------------+  |  |  |" << endl
+     << "     hour (0 - 23) ---------------------------+  |  |  |  |" << endl
+     << "     min (0 - 59) -------------------------+  |  |  |  |  |" << endl
+     << "     sec (0 - 59) -----------------------  |  |  |  |  |  |" << endl
+     << "                                        |  |  |  |  |  |  |" << endl
+     << "                                        -  -  -  -  -  -  -" << endl
+     << "                                        *  *  *  *  *  *  *" << endl;
    cerr << "  Substitute a asterix (*) as a placeholder for arguments"
      << " you are not" << endl
      << "  interested in. Asterixes are automatically placed in strings missing all 6"
@@ -224,10 +225,11 @@ int main(int argc, char **argv)
    string sDomOffset="*";
    string sMonthOffset="*";
    string sDowOffset="*";
+   string sDriftOffset="*";
    string sCronStr="";
 
    // Define Drift Time
-   unsigned nDriftOffset=Date::T_NO_DRIFT;
+   unsigned nDriftOffset=Date::T_NO_ENTRY;
 
    // Declare the supported options.
    po::options_description poAllOptions("Allowed options");
@@ -243,7 +245,7 @@ int main(int argc, char **argv)
        ("month,m", po::value<string>(), "Month (1-12) {Jan=1,...,Dec=12}")
        ("dow,w", po::value<string>(), "Day of Week (0-6) {Sun=0,...,Sat=6}")
        ("cron,c", po::value<string>(), "Cron string formatting")
-       ("drift,x", po::value<unsigned>(), "Additional drift time (in seconds).")
+       ("drift,x", po::value<string>(), "Additional drift time (in seconds).")
    ;
 
    // Parse all the options and ensure the critical ones have been defined.
@@ -322,11 +324,10 @@ int main(int argc, char **argv)
       {
          sDowOffset = poVariablesMap["dow"].as<string>();
       }
-
-      // Store Drift Time
+      // Store Drift
       if ((poVariablesMap.count("drift")))
       {
-         nDriftOffset = poVariablesMap["drift"].as<unsigned>();
+         sDriftOffset = poVariablesMap["drift"].as<string>();
       }
 
       // cout << "Executing Cron("
@@ -341,7 +342,8 @@ int main(int argc, char **argv)
                             sHourOffset,
                             sDomOffset,
                             sMonthOffset,
-                            sDowOffset))
+                            sDowOffset,
+                            sDriftOffset))
       {
          cerr << "Error: Syntax Invalid : '"
             << sSecOffset
@@ -349,17 +351,20 @@ int main(int argc, char **argv)
             << " " << sHourOffset
             << " " << sDomOffset
             << " " << sMonthOffset
-            << " " << sDowOffset << "'" << endl;
+            << " " << sDowOffset
+            << " " << sDriftOffset
+            << "'" << endl;
             ProgramExamples();
          return 1;
       }
+
       dObjFinish = dObjStart.Cron(sSecOffset,
                      sMinOffset,
                      sHourOffset,
                      sDomOffset,
                      sMonthOffset,
                      sDowOffset,
-                     nDriftOffset);
+                     sDriftOffset);
    }
    else
    {
@@ -415,7 +420,7 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
 
    static char* kwlist[] = {"cron", "drift", "block", "ref", NULL};
    // Drift Time
-   unsigned long drift = Date::T_NO_DRIFT;
+   unsigned long drift = Date::T_NO_ENTRY;
    // Block Flag; By default we always block (true=block, false=no block)
    bool block = true;
    // Reference Date/Time
@@ -602,5 +607,7 @@ initdateblock()
    PyModule_AddIntConstant(m, "YEAR_MAX", Date::T_YEAR_MAX);
    PyModule_AddIntConstant(m, "DOW_MIN", Date::T_DOW_MIN);
    PyModule_AddIntConstant(m, "DOW_MAX", Date::T_DOW_MAX);
+   PyModule_AddIntConstant(m, "DRIFT_MIN", Date::T_DRIFT_MIN);
+   PyModule_AddIntConstant(m, "DRIFT_MAX", Date::T_DRIFT_MAX);
 }
 #endif
