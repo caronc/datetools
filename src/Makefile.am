@@ -1,5 +1,5 @@
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -16,6 +16,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # 
 bin_PROGRAMS=dateblock datemath
+#bin_PROGRAMS=dateblock datemath unittest
+#unittest_SOURCES=Date.cpp unittest.cpp
 dateblock_SOURCES=Date.cpp dateblock.cpp
 datemath_SOURCES=Date.cpp datemath.cpp
 
@@ -42,7 +44,7 @@ all-local: build-python
 endif #HAS_PYTHON
 
 clean-python:
-	rm -f dateblock.so
+	rm -rf build dateblock.so
 
 PHONY_TARGETS = clean-python
 

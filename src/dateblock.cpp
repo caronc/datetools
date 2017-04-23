@@ -228,9 +228,6 @@ int main(int argc, char **argv)
    string sDriftOffset="*";
    string sCronStr="";
 
-   // Define Drift Time
-   unsigned nDriftOffset=Date::T_NO_ENTRY;
-
    // Declare the supported options.
    po::options_description poAllOptions("Allowed options");
    po::variables_map poVariablesMap;
@@ -238,6 +235,7 @@ int main(int argc, char **argv)
        ("help,h", "Show this help screen.")
        ("test,t", "Test (Do not block for the specified period)")
        ("verbose,v", "Verbose mode")
+       ("isc,i", "ISC mode")
        ("second,s", po::value<string>(), "Second (0-59)")
        ("minute,n", po::value<string>(), "Minute (0-59)")
        ("hour,o", po::value<string>(), "Hour (0-23)")
@@ -368,11 +366,14 @@ int main(int argc, char **argv)
    }
    else
    {
+      // ISC Format
+      bool useISC = (poVariablesMap.count("isc") > 0);
+
       // Parse the old school cron format
       sCronStr = poVariablesMap["cron"].as<string>();
       //cout << "Executing Cron(\""
       //     << sCronStr << "\");" << endl;
-      if(!Date::CronValid(sCronStr))
+      if(!Date::CronValid(sCronStr, useISC))
       {
          cerr << "Error: Syntax Invalid : '"
             << sCronStr << "'" << endl;
@@ -380,7 +381,7 @@ int main(int argc, char **argv)
          return 1;
       }
 
-      dObjFinish = dObjStart.Cron(sCronStr);
+      dObjFinish = dObjStart.Cron(sCronStr, useISC);
    }
 
 
@@ -417,17 +418,23 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
    char *str;
    PyObject *pCronObj = NULL;
    PyObject *pBlockObj = Py_True;
+   PyObject *pIscObj = Py_False;
 
-   static char* kwlist[] = {"cron", "drift", "block", "ref", NULL};
-   // Drift Time
-   unsigned long drift = Date::T_NO_ENTRY;
+   static char* kwlist[] = {"cron", "block", "ref", "isc", NULL};
+
    // Block Flag; By default we always block (true=block, false=no block)
    bool block = true;
+
+   // use isc cron type (no seconds or drift in cron entry); by default we use
+   // the dateblock format
+   bool isc = false;
+
    // Reference Date/Time
    PyObject *pDateObj = NULL;
 
    // Time initializes to 'Now'
    Date dObjStart;
+
    // Reference Time; the only difference between this and the start time
    // is that the Start time may be adjusted based on a passed in reference
    // time.  When we preform a check to decide if we need to block or not, we
@@ -437,8 +444,8 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
    // Finish time will be adjusted below base on cron value specified
    Date dObjFinish;
 
-   if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|lOO", kwlist,
-            &pCronObj, &drift, &pBlockObj, &pDateObj))
+   if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|OOO", kwlist,
+            &pCronObj, &pBlockObj, &pDateObj, &pIscObj))
    {
       // Couldn't parse content
       return NULL;
@@ -514,6 +521,16 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
                   "Reference date format is not supported.");
             return NULL;
          }
+         #ifdef DEBUG
+         cerr << "DEBUG Python::Reference('" <<
+            dObjStart.Year() <<
+            "-" << dObjStart.Month() <<
+            "-" << dObjStart.DOM() <<
+            " " << dObjStart.Hour() <<
+            ":" << dObjStart.Min() <<
+            ":" << dObjStart.Sec()
+               << ")" << endl;
+         #endif
       }
    }
 
@@ -521,14 +538,6 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
    str = PyString_AsString(pCronObj);
    if(str == NULL)
    {
-      PyErr_SetString(PyExc_SyntaxError,
-            "The cron specified is not formatted correctly.");
-      return NULL;
-   }
-
-   if(!Date::CronValid(str))
-   {
-      // Raise SyntaxError Exception
       PyErr_SetString(PyExc_SyntaxError,
             "The cron specified is not formatted correctly.");
       return NULL;
@@ -548,7 +557,35 @@ static PyObject* dateblock(PyObject *self, PyObject *args, PyObject *kwds)
       block = (PyInt_AS_LONG(pBlockObj) != 0);
    }
 
-   dObjFinish = dObjStart.Cron(str, drift);
+   /* Determine if we are using isc format or not */
+   if(PyBool_Check(pIscObj))
+   {
+      isc = (bool) ((PyBoolObject *) pIscObj)->ob_ival;
+   }
+   else if (PyInt_Check(pIscObj))
+   {
+      // We'll be kind to those who ignore the fact that we're
+      // expecting a bool and treat integers as we would booleans
+      // smart developers will never cause this part of the code
+      // to be reached :)
+      isc = (PyInt_AS_LONG(pIscObj) != 0);
+   }
+
+   #ifdef DEBUG
+   cerr << "DEBUG Python::dateblock('" << str
+      << "', isc=" << (string) (isc?"y":"n")
+      << ",block=" << (string) (block?"y":"n") << endl;
+   #endif
+
+   if(!Date::CronValid(str, isc))
+   {
+      // Raise SyntaxError Exception
+      PyErr_SetString(PyExc_SyntaxError,
+            "The cron specified is not formatted correctly.");
+      return NULL;
+   }
+
+   dObjFinish = dObjStart.Cron(str, isc);
 
    if(block && dObjFinish.Time() > dObjRef.Time())
    {

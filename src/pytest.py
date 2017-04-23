@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -34,6 +34,13 @@ print dateblock("*/1", ref=None, block=False)
 # Epoch Time
 print dateblock("*/1", ref=7999434323, block=False)
 # Drift Time
-print dateblock("*/10", ref=7999434323, block=False, drift=5)
+print dateblock("*/10 +5", ref=7999434323, block=False)
 # Blocking should never be possible if the time is in the past
-print dateblock("*/10", ref=999434323, block=True, drift=7)
+print dateblock("*/10 +7", ref=999434323, block=True)
+# Drifting inline
+print dateblock("*/10 +5", ref=date(2000, 1, 1), block=False)
+# Drifting inline (with option specified, inline should over-ride)
+# Drifting without use of +
+print dateblock("*/10 * * * * * 5", ref=date(2000, 2, 1), block=False)
+# Drifting with multiple options specified
+print dateblock("* 10 +5,8", ref=date(2000, 3, 1), block=False)

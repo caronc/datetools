@@ -18,10 +18,21 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from distutils.core import setup, Extension
 
-setup(name = "dateblock",
-      version = "@PACKAGE_VERSION@",
-      description='Python Cron',
-      author='Chris Caron',
-      author_email='lead2gold@gmail.com',
-      ext_modules = [Extension("dateblock", ["Date.cpp", "dateblock.cpp"],
-                               define_macros=[('PYTHON_MODULE', '1'),])])
+setup(
+    name = "dateblock",
+    version = "@PACKAGE_VERSION@",
+    url='https://github.com/caronc/datetools/',
+    description="""
+        Python Cron-like date mainpulation
+    """.strip(),
+    author='Chris Caron',
+    author_email='lead2gold@gmail.com',
+    license="GPLv2",
+    ext_modules = [
+        Extension("dateblock", ["Date.cpp", "dateblock.cpp"],
+                  define_macros=[
+                      ('PYTHON_MODULE', '1'),
+#                      ('DEBUG', '1'),
+                  ])],
+    keywords='date sleep block time manipulation cron',
+)
