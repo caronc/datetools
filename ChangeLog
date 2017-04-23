@@ -1,0 +1,22 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+## [1.0.0] - 2017-04-21
+### Added
+- Drift option now supported inline as part of the cron
+- using a plus (+) you can denote the drift entry in the cron. For example:
+'0 /5 +4' is the same as writing '0 /5 * * * * 4'.  In this example we would
+unblock every 5 minutes but drift an additional 4 seconds.  Inline drifting
+allows multiple drifts such as '0 /5 +15,45' giving the same benifits as the
+other fields do using this option.
+- Internet Systems Consortium (ISC) support added (which is effectively
+support for the standard cron format in addition to the enhanced one provided
+by dateblock.
+
+## [0.8.1] - 2015-08-17
+### Changed
+- Fixed bug where month was missing in printout formatting
+
+## [0.8.0] - 2013-10-26
+### Added
+- Initial commit to GitHub

@@ -1,5 +1,5 @@
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013-2014 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -20,7 +20,7 @@ Group: System Environment/Base
 License: GPLv2+
 Name: datetools
 Release: 1%{?dist}.nuxref
-Version: 0.8.1
+Version: 1.0.0
 Source: %{name}-%{version}.tar.gz
 Packager: Chris Caron <lead2gold@gmail.com>
 URL: http://nuxref.com
@@ -28,9 +28,10 @@ Buildroot: %{_tmppath}/%{name}-%{version}-root
 Requires: boost, libstdc++
 Requires: dateblock = %{version}-%{release}
 Requires: datemath = %{version}-%{release}
+Requires: boost-program-options
 Provides: datetools
 BuildRequires: glib-devel
-BuildRequires: boost-devel, libstdc++-devel, python-devel
+BuildRequires: boost-devel, gcc-c++, libstdc++-devel, python-devel
 # Nice to have available:
 BuildRequires: autoconf, automake, libtool
 
@@ -93,7 +94,10 @@ make clean
 %attr(-,root,root) %{python_sitearch}/*
 
 %changelog
-* Thu Oct 18 2013 Chris Caron <lead2gold@gmail.com> 0.8.1-1
+* Fri Apr 21 2017 Chris Caron <lead2gold@gmail.com> 1.0.0-1
+- Updated to version 1.0.0
+
+* Fri Jul 17 2015 Chris Caron <lead2gold@gmail.com> 0.8.1-1
 - Updated to version 0.8.1
 
 * Thu Oct 18 2013 Chris Caron <lead2gold@gmail.com> 0.8.0-1

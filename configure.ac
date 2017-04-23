@@ -1,5 +1,5 @@
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -15,7 +15,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 AC_PREREQ(2.59)
-AC_INIT(datetools, 0.8.1, lead2gold@gmail.com)
+AC_INIT(datetools, 1.0.0, lead2gold@gmail.com)
 
 AC_CONFIG_HEADERS(src/config.h)
 
