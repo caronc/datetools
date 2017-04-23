@@ -1241,13 +1241,13 @@ bool Date::CronValid(const string& strIn, bool isISC)
    size_t token_max = isISC?ISC_CRON_FIELD_COUNT:DBL_CRON_FIELD_COUNT;
 
    vector<string> v_tokens;
-   for (tokenizer::iterator tok_iter = tokens.begin();
-      tok_iter != tokens.end(); ++tok_iter)
+   tokenizer::iterator tok_iter = tokens.begin();
+   for (;tok_iter != tokens.end(); ++tok_iter)
    {
-      if (v_tokens.size() > token_max)
+      if (v_tokens.size() >= token_max)
       {
-         // no more entries
-         break;
+        // More entries then expected found
+        return false;
       }
 
       // Look for a + as that signifies the drift entry
@@ -1443,7 +1443,6 @@ const Date Date::Cron(const string& strIn, bool isISC) const
    while ( v_tokens.size() < token_max )
       v_tokens.insert(v_tokens.end(), "*");
 
-   // Convert to cron
    #ifdef DEBUG
    cerr << "DEBUG Date::Cron("
       << v_tokens[0] << ","
@@ -1457,6 +1456,7 @@ const Date Date::Cron(const string& strIn, bool isISC) const
       << endl;
    #endif
 
+   // Convert cron to the next relative date
    return isISC?
          // Yes? Ok then skip the 'seconds' field (defaults to '*')
          Cron("*", v_tokens[0], v_tokens[1], v_tokens[2], v_tokens[3],
