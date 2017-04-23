@@ -81,7 +81,13 @@ what it is today (ISC stands for Internet Systems Consortium). Hence:
      *  *  *  *  *
 ```
 
-### Drifts:
+The __--test__(__-t__) switch is your greatest ally.  Use this to simply build
+and test your crons to find out when they __would have__ blocked until without
+actually blocking.  If you pair the the test with the __--ics__ (__-i__), then
+you can use this tool to help construct regular crons for _/etc/crontab_ if
+you're new to the idea and still learning how the crontabs work.
+
+### Drifting:
 Drifting is an option that allows you to adjust the calculated results by some
 additional time.  Lets say you wanted the application to wake up on the 1st
 minute of each 10 min interval (1, 11, 21, 31, 41, 51). Specifying the cron
@@ -105,25 +111,28 @@ Some things to consider about drifting:
   way to prevent missing a segment of time that would have otherwise been
   calculated. For example... lets say you wanted to unblock every hour, your
   cron might look like this: ```dateblock --hour=/1```. With this cron in
-  mind, you could never add a drift of a value larger then 1 hour (3660)...
-  Why? Because the _--hour_ entry has already defined the time (slice) bounds
-  of 1 hour and a drift value of that same (or more) would cause it to spill
-  into _the next_ hour; an hour that would have already been calculated.
+  mind, you could never add a drift of a value larger then 1 hour minus 
+  1 second (3659 seconds)... Why? Because the _--hour_ entry has already
+  pre-defined the time (slice) bounds of 1, therefore a drift value of the
+  same (or more) would cause the calculation to spill into _the next_ hour. An
+  hour it was pre-calculated to wake on anyway.
 
-  The drift can still be used in all scenarios; lets say you wanted to wake
-  ever 2 hours. ```dateblock --hour=/2```.  Well with this, you can set your
-  drift up to that same amount (2 hours or 7320 seconds).
+  Let's say you wanted to wake ever 2 hours. Well your cron would look like this
+  ```dateblock --hour=/2```.  If you wanted to add a drift into this picture,
+  you'd have up to 2 hours minus 1 second (7319) to work with.
 
-  Perhaps another way to word this is: _The maximum drift value is __always__
-  relative to the largest timeslice it can fit within._
+  However... if you specify a a cron of '*/10' (which would equate to
+  unblocking every 10 seconds), your drift window is only a maximum of 9. So
+  if you specified a drift of of 11 (seconds), the overflow would leave you
+  with an actual drift of '1' (not 11). If you specified 10, then you would
+  not drift at all (would be the same as not setting anything at all). This
+  is how the modulus works when you overflow the drift value.
 
-- You can use the shortcut character of a _plus_ (_+_) to immediately invoke
-  the drift (from a cron entry) or simply use it with the __--drift__ (__-d__)
-  option.
-
-  For example... if you specify a a cron of '*/10' (which would equate to
-  unblocking every 10 seconds), and specified a drift of of 11 (seconds), the
-  overflow would leave you with an actual drift of '1' (not 11).
+- You can use the shortcut character of a _plus_ (_+_) inline on a cron to immediately
+  invoke the drift and spare you from writing the extra entries. Hence:
+  '''dateblock -c '* */5 +60''' is the same as writing ```dateblock -c '* */5 * * * * 60```
+  Once you invoke the __+__ character however, any entries found afterwards
+  will be treated as an error.
 
 ### Examples
 The following would block until a minute divisible by 10 was reached.  Minutes
