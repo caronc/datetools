@@ -8,11 +8,12 @@ specific point of time unlike 'sleep' which blocks _for_ a set period of time.
 The difference is very subtle but can prove to be very useful.
 
 It offers a few new features that the Internet Systems Consortium (ICS) version
-does not. Specifically the ability to wake on a specific second and
-additionally drift for certain period aftewards (kind of like combining sleep
-and cron into one).
+does not (refering to /etc/crontab style). Dateblock specifically offers the ability
+to wake/unblock on a _specific second_ and/or _drift_ for certain period afterwards
+your calculated time is met (kind of like combining _sleep_ and _ICS Cron_ into one).
 
-Python bindings can additionally be installed for this too.
+Python bindings are additionally included supporting all of the standard datetime
+formats and objects!
 
 __Syntax__:
 dateblock [options]
@@ -39,8 +40,6 @@ A variety of syntax is accepted by this tool such as:
   */x (or /x)     (Modulus)   where 'x' is represented numerically.
   x-y (or y-x)    (Range)     where 'x' and 'y' are are represented numerically.
   x,y             (Separator) where 'x' and 'y' are are represented numerically.
-  +x              (Drift)     where 'x' is a drift value.  This option must be
-                               the last specified.
 ```
 
 __Note__: With the exception of the drift option (+), all variations of the syntax
