@@ -130,7 +130,7 @@ Some things to consider about drifting:
 
 - You can use the shortcut character of a _plus_ (_+_) inline on a cron to immediately
   invoke the drift and spare you from writing the extra entries. Hence:
-  '''dateblock -c '* */5 +60''' is the same as writing ```dateblock -c '* */5 * * * * 60```
+  ```dateblock -c '* */5 +60'``` is the same as writing ```dateblock -c '* */5 * * * * 60'```
   Once you invoke the __+__ character however, any entries found afterwards
   will be treated as an error.
 
