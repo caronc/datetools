@@ -3,10 +3,16 @@ Date/Time Manipulation
 Datetools packages itself with 2 tools, dateblock and datemath.
 
 ## Dateblock
-Dateblock allows you to block until a period of time arrives
-unlike 'sleep' which blocks for a set period of time. The difference
-is very subtle but can prove to be useful. Python bindings can
-additionally be installed for this too.
+Dateblock allows you to block (exactly how a Linux/Unix Cron might) _until_ a
+specific point of time unlike 'sleep' which blocks _for_ a set period of time.
+The difference is very subtle but can prove to be very useful.
+
+It offers a few new features that the Internet Systems Consortium (ICS) version
+does not. Specifically the ability to wake on a specific second and
+additionally drift for certain period aftewards (kind of like combining sleep
+and cron into one).
+
+Python bindings can additionally be installed for this too.
 
 __Syntax__:
 dateblock [options]
@@ -84,6 +90,10 @@ minute of each 10 min interval (1, 11, 21, 31, 41, 51). Specifying the cron
 every minute. You could however achieve the previous example using a drift
 value of '60' (seconds) and a cron (minute) entry of '*/10'.
 
+In a way, drifting is a little like executing a cron and then sleeping for
+an additional period right afterwards.  However this is a much more elegant
+solution with a more precise blocking period.
+
 Some things to consider about drifting:
 
 - Drifting is always calculated 'after' a specified cron.
@@ -94,7 +104,23 @@ Some things to consider about drifting:
   In the event this occurs, only the remainder (modulus) is kept; the rest is
   is considered overflow and will simply be ignored.  Drifting behaves this
   way to prevent missing a segment of time that would have otherwise been
-  calculated.
+  calculated. For example... lets say you wanted to unblock every hour, your
+  cron might look like this: ```dateblock --hour=/1```. With this cron in
+  mind, you could never add a drift of a value larger then 1 hour (3660)...
+  Why? Because the _--hour_ entry has already defined the time (slice) bounds
+  of 1 hour and a drift value of that same (or more) would cause it to spill
+  into _the next_ hour; an hour that would have already been calculated.
+
+  The drift can still be used in all scenarios; lets say you wanted to wake
+  ever 2 hours. ```dateblock --hour=/2```.  Well with this, you can set your
+  drift up to that same amount (2 hours or 7320 seconds).
+
+  Perhaps another way to word this is: _The maximum drift value is __always__
+  relative to the largest timeslice it can fit within._
+
+- You can use the shortcut character of a _plus_ (_+_) to immediately invoke
+  the drift (from a cron entry) or simply use it with the __--drift__ (__-d__)
+  option.
 
   For example... if you specify a a cron of '*/10' (which would equate to
   unblocking every 10 seconds), and specified a drift of of 11 (seconds), the
