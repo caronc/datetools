@@ -1222,7 +1222,7 @@ bool Date::CronValid(const string& strIn, bool isISC)
    //     -  -  -  -  -  -  -
    //     *  *  *  *  *  *  *
    //
-   //         ISC Format (no second)
+   //         ISC Format (no second or drift)
    //
    //     +----------------------------- min (0 - 59)
    //     |  +----------------------- hour (0 - 23)
