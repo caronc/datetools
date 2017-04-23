@@ -16,6 +16,7 @@ __Allowed options__:
   -h [ --help ]         Show this help screen.
   -t [ --test ]         Test (Do not block for the specified period)
   -v [ --verbose ]      Verbose mode
+  -i [ --isc ]          ISC Mode
   -s [ --second ] arg   Second (0-59)
   -n [ --minute ] arg   Minute (0-59)
   -o [ --hour ] arg     Hour (0-23)
@@ -36,14 +37,14 @@ A variety of syntax is accepted by this tool such as:
                                the last specified.
 ```
 
- Note: With the exception of the drift option (+), all variations of the syntax
-       mentioned above can be mixed if separated using the 'comma' (Separator)
-       operator.  ie: */a,b,c-d,/e is valid.
-       However: x-y-z is not valid, nor is /x/y or /x-y. All values must be
-       within the range of it's time type. Thus 400-4000 would never work since
-       no time constraint even resides within that range.
+__Note__: With the exception of the drift option (+), all variations of the syntax
+      mentioned above can be mixed if separated using the 'comma' (Separator)
+      operator.  ie: */a,b,c-d,/e is valid.
+      However: x-y-z is not valid, nor is /x/y or /x-y. All values must be
+      within the range of it's time type. Thus 400-4000 would never work since
+      no time constraint even resides within that range.
 
- The cron (--cron|-c) switch allows one to specify the standard cron formatting:
+The __--cron__(__-c__) switch allows one to specify the standard cron formatting:
 ```
      drift time ----------------------------------------------+
      day of week (0 - 6) (Sunday=0) -----------------------+  |
@@ -56,12 +57,26 @@ A variety of syntax is accepted by this tool such as:
                                             -  -  -  -  -  -  -
                                             *  *  *  *  *  *  *
 ```
-  Substitute a asterisk (*) as a placeholder for arguments you are not
-  interested in. Asterisks are automatically placed in strings missing all 6
-  arguments (separated by white space).
+Substitute an asterisk (*) as a placeholder for arguments you are not
+interested in. Asterisks are automatically placed in strings missing all 6
+arguments (separated by white space).
 
-Drifts:
+The __--isc__ (__-i__) switch makes the cron interpretation equivalent to
+what it is today (ISC stands for Internet Systems Consortium). Hence:
+```
+         ISC Format (no second or drift)
 
+     +----------------------------- min (0 - 59)
+     |  +----------------------- hour (0 - 23)
+     |  |  +----------------- day of month (1 - 31)
+     |  |  |  +----------- month (1 - 12)
+     |  |  |  |  +----- day of week (0 - 6) (Sunday=0)
+     |  |  |  |  |
+     -  -  -  -  -
+     *  *  *  *  *
+```
+
+### Drifts:
 Drifting is an option that allows you to adjust the calculated results by some
 additional time.  Lets say you wanted the application to wake up on the 1st
 minute of each 10 min interval (1, 11, 21, 31, 41, 51). Specifying the cron
@@ -140,30 +155,8 @@ period. However this is still valid:
 dateblock -c "* 5 * * * * +20"
 ```
 
-__Note:__ Since version 1.0.0 introduced inline drift entries, the
-__--drift__ (__-x__) becomes ambigious. But to remain backwards compatible I
-prefer to leave these switches as they are. So how it will work is: if you
-specify a drift value on the command line 'and' in the cron, they will both
-be used. For example, the following will treat the result as a drift of 20
-and a drift of 10:
-```bash
-dateblock -c "* 5 * * * * 20" --drift=10
-
-# the above could be re-written like this if you wanted:
-dateblock -c "* 5 * * * * 20,10"
-
-# Or even this:
-dateblock -c "* 5 +20,10"
-
-# Lastly, this is also viable:
-dateblock -c "* 5 * * * * 10" --drift=20
-
-# and...
-dateblock -c "* 5" --drift=10,20
-```
-
-
-The python bindings are really easy to use too:
+### DateBlock Python Bindings
+The DateBlock python bindings are really easy to use too:
 ```python
 from dateblock import dateblock
 from datetime import datetime
@@ -180,9 +173,24 @@ print("Unblocked at %s" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 relative = datetime.now() - timedelta(days=4)
 result = dateblock("* /20", ref=relative, block=False)
 
-# You can specify the drift as an option to the command line as well
-# The following would return the unblock time with the drift included
-result = dateblock("* /20", drift=300, block=False)
+# To use the isc switch with the bindings, just set isc=True (by default
+# it is off). Below would block for the start of each minute (not second
+# had you not set the isc flag)
+result = dateblock("/1", isc=True)
+
+# Dateblock supports date, time and epoch time too!
+#
+# Date: (yyyy, mm, dd)
+from dateblock import date
+result = dateblock("/5", ref=date(2017, 4, 22))
+
+# Time: (hh, mm, ss)
+from dateblock import time
+result = dateblock("/5", ref=time(10, 5, 0))
+
+# Epoch: seconds
+result = dateblock("/5", ref=13424236)
+
 ```
 
 ## Datemath
@@ -207,7 +215,9 @@ __Options__:
 ```
 
 ## Installation
-Assuming you have GNU C++ compiler and the standard development tools that usually go with it (make, autoconf, automake, etc) then the following will install everything for you.
+Assuming you have GNU C++ compiler and the standard development tools that
+usually go with it (make, autoconf, automake, etc) then the following will
+install everything for you.
 
 ```bash
 autogen.sh
