@@ -27,6 +27,7 @@
 #include <vector>
 #include <ctype.h>
 #include <sstream>
+#include <iomanip>
 #include "Date.h"
 
 #include <boost/tokenizer.hpp>
@@ -1701,10 +1702,9 @@ bool Date::FindAndReplace(string &sourceString, const string &findString,
    string replaceString;
    string::size_type findStringLoc;
    string s;
+
    stringstream out;
-   out.width(width);
-   out.fill(fill);
-   out << replaceNum;
+   out << setw(width) << setfill(fill) << replaceNum;
    replaceString = out.str();
 
    bool foundAtLeastOne;
