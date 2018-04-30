@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2018 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public

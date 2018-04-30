@@ -1,5 +1,5 @@
 # Datetools provide a method of manipulating and working dates and times.
-# Copyright (C) 2013-2017 Chris Caron <lead2gold@gmail.com>
+# Copyright (C) 2013-2018 Chris Caron <lead2gold@gmail.com>
 #
 # This file is part of Datetools.  Datetools is free software; you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -20,7 +20,7 @@ Group: System Environment/Base
 License: GPLv2+
 Name: datetools
 Release: 1%{?dist}.nuxref
-Version: 1.0.0
+Version: 1.0.1
 Source: %{name}-%{version}.tar.gz
 Packager: Chris Caron <lead2gold@gmail.com>
 URL: http://nuxref.com
@@ -94,6 +94,9 @@ make clean
 %attr(-,root,root) %{python_sitearch}/*
 
 %changelog
+* Mon Apr 30 2018 Chris Caron <lead2gold@gmail.com> 1.0.1-1
+- Updated to version 1.0.1
+
 * Fri Apr 21 2017 Chris Caron <lead2gold@gmail.com> 1.0.0-1
 - Updated to version 1.0.0
 

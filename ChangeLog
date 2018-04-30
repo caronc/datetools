@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2018-04-30
+### Changed
+- fixed padding issue with dates (padding with a zero)
+- pypi support
+
 ## [1.0.0] - 2017-04-21
 ### Added
 - Drift option now supported inline as part of the cron

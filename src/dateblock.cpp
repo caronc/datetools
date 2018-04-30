@@ -1,6 +1,6 @@
 /*
  Datetools provide a method of manipulating and working dates and times.
- Copyright (C) 2013 Chris Caron <lead2gold@gmail.com>
+ Copyright (C) 2013-2018 Chris Caron <lead2gold@gmail.com>
 
  This file is part of Datetools.  Datetools is free software; you can
  redistribute it and/or modify it under the terms of the GNU General Public
@@ -109,7 +109,7 @@ unsigned long Block(unsigned long nsecs)
 void ProgramDetails()
 {
    cerr << "Dateblock v" << PACKAGE_VERSION  << " "
-        << "Copyright (C) 2013-2017 " << AUTHOR << endl << endl
+        << "Copyright (C) 2013-2018 " << AUTHOR << endl << endl
         << "Dateblock comes with ABSOLUTELY NO WARRANTY" << endl
         << "This is free software, and you are welcome to redistribute it" << endl
         << "under certain conditions; see man pages for details." << endl << endl
