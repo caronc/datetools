@@ -16,15 +16,21 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-from distutils.core import setup, Extension
+
+try:
+    from setuptools import setup
+
+except ImportError:
+    from distutils.core import setup
+
+from distutils.core import Extension
 
 setup(
     name = "dateblock",
-    version = "1.0.0",
+    version = "1.0.2",
     url='https://github.com/caronc/datetools/',
-    description="""
-        Python Cron-like date mainpulation
-    """.strip(),
+    long_description=open('README.md').read(),
+    description="Python Cron-like date mainpulation",
     author='Chris Caron',
     author_email='lead2gold@gmail.com',
     license="GPLv2",
