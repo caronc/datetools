@@ -15,7 +15,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 AC_PREREQ(2.59)
-AC_INIT(datetools, 1.0.2, lead2gold@gmail.com)
+AC_INIT(datetools, 1.0.3, lead2gold@gmail.com)
 
 AC_CONFIG_HEADERS(src/config.h)
 

@@ -3,5 +3,7 @@ include README.md
 include COPYING
 include ChangeLog
 include AUTHORS
+include src/dateblock.h
+include src/Date.h
 global-exclude *.pyc
 global-exclude __pycache__

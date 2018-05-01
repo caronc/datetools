@@ -27,7 +27,7 @@ from distutils.core import Extension
 
 setup(
     name = "dateblock",
-    version = "1.0.2",
+    version = "1.0.3",
     url='https://github.com/caronc/datetools/',
     long_description=open('README.md').read(),
     description="Python Cron-like date mainpulation",
@@ -45,10 +45,13 @@ setup(
                 'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
             ),
     ext_modules = [
-        Extension("dateblock", ["src/Date.cpp", "src/dateblock.cpp"],
-                  libraries=['stdc++'],
-                  define_macros=[
-                      ('PYTHON_MODULE', '1'),
-                  ])],
+        Extension("dateblock", [
+            "src/Date.cpp",
+            "src/dateblock.cpp",
+        ],
+        libraries=['stdc++'],
+        define_macros=[
+            ('PYTHON_MODULE', '1'),
+        ])],
     keywords='date sleep block time manipulation cron',
 )
